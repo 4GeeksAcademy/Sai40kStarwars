@@ -12,32 +12,77 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			personajes: [],
+			planetas: [],
+			vehiculos: [],
+			masInfo: [],
+			favoritos: [],
+			background: "",
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			getPersonajes: function () {
+				fetch("https://www.swapi.tech/api/people")
+					.then(res => res.json())
+					.then(data => {
+						console.log(data);
+						setStore({ personajes: data.results })
+					})
+					.catch(err => console.error(err))
 			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+			getPlanetas: function () {
+				fetch("https://www.swapi.tech/api/planets")
+					.then(res => res.json())
+					.then((data) => {
+						console.log(data);
+						setStore({ planetas: data.results })
+					})
+					.catch(err => console.error(err))
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
+			getVehiculos: function () {
+				fetch("https://www.swapi.tech/api/vehicles")
+					.then(res => res.json())
+					.then(data => {
+						console.log(data);
+						setStore({ vehiculos: data.results })
+					})
+					.catch(err => console.error(err))
+			},
+			getMasInfo: function (categorias, uid) {
+				fetch(`https://www.swapi.tech/api/${categorias}/${uid}`)
+					.then(res => res.json())
+					.then(data => {
+						// console.log(data);
+						setStore({ masInfo: data.result })
+					})
+					.catch(err => console.error(err))
+			},
+			addFav: function (name) {
+				let listadeFav = getStore().favoritos;
+				let nuevoFav = name
+				let nuevaListaDeFav = listadeFav.concat(nuevoFav)
+				setStore({ favoritos: nuevaListaDeFav })
+			},
+			removeFav: function (name) {
+				let listadeFav = getStore().favoritos;
+				let nuevaListaDeFav = listadeFav.filter((item) => name !== item)
+				setStore({ favoritos: nuevaListaDeFav })
+			},
+			favoritos: function (name) {
+				let favNames = getStore().favoritos
+		
+			   if (getStore().favoritos.length == 0) {
+				getActions().addFav(name)
+			   } else {
+				if (favNames.includes(name)) {
+					getActions().removeFav(name)
+				} else {
+					getActions().addFav(name)
+				}
+			   }
+			   
 			}
+
 		}
 	};
 };
